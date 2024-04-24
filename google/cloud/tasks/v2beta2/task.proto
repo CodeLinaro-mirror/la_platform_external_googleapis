@@ -1,4 +1,4 @@
-// Copyright 2018 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,18 +16,23 @@ syntax = "proto3";
 
 package google.cloud.tasks.v2beta2;
 
-import "google/api/annotations.proto";
+import "google/api/resource.proto";
 import "google/cloud/tasks/v2beta2/target.proto";
 import "google/protobuf/timestamp.proto";
 import "google/rpc/status.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/cloud/tasks/v2beta2;tasks";
+option go_package = "cloud.google.com/go/cloudtasks/apiv2beta2/cloudtaskspb;cloudtaskspb";
 option java_multiple_files = true;
 option java_outer_classname = "TaskProto";
 option java_package = "com.google.cloud.tasks.v2beta2";
 
 // A unit of scheduled work.
 message Task {
+  option (google.api.resource) = {
+    type: "cloudtasks.googleapis.com/Task"
+    pattern: "projects/{project}/locations/{location}/queues/{queue}/tasks/{task}"
+  };
+
   // The view specifies a subset of [Task][google.cloud.tasks.v2beta2.Task]
   // data.
   //
@@ -108,6 +113,12 @@ message Task {
     // A pull task is a task that has
     // [PullMessage][google.cloud.tasks.v2beta2.PullMessage] set.
     PullMessage pull_message = 4;
+
+    // HTTP request that is sent to the task's target.
+    //
+    // An HTTP task is a task that has
+    // [HttpRequest][google.cloud.tasks.v2beta2.HttpRequest] set.
+    HttpRequest http_request = 13;
   }
 
   // The time when the task is scheduled to be attempted.
@@ -140,7 +151,7 @@ message Task {
 message TaskStatus {
   // Output only. The number of attempts dispatched.
   //
-  // This count includes tasks which have been dispatched but haven't
+  // This count includes attempts which have been dispatched but haven't
   // received a response.
   int32 attempt_dispatch_count = 1;
 
