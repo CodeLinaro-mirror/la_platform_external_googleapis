@@ -1,4 +1,4 @@
-// Copyright 2018 Google LLC.
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
 syntax = "proto3";
 
@@ -22,6 +21,7 @@ import "google/devtools/resultstore/v2/file.proto";
 
 option go_package = "google.golang.org/genproto/googleapis/devtools/resultstore/v2;resultstore";
 option java_multiple_files = true;
+option java_outer_classname = "TestSuiteProto";
 option java_package = "com.google.devtools.resultstore.v2";
 
 // The result of running a test suite, as reported in a <testsuite> element of
@@ -139,6 +139,16 @@ message TestCase {
   // The file IDs must be unique within this list. Duplicate file IDs will
   // result in an error. Files will be returned in lexicographical order by ID.
   repeated File files = 9;
+
+  // The 0-indexed retry number of the test case. A value of `0` may indicate
+  // either that this is the first in a series of retries, or that no retries
+  // were requested.
+  int32 retry_number = 10;
+
+  // The 0-indexed repeat number of the test case. A value of `0` may indicate
+  // either that this is the first in a series of repeats, or that no repeats
+  // were requested.
+  int32 repeat_number = 11;
 }
 
 // Represents a violated assertion, as reported in a <failure> element within a
