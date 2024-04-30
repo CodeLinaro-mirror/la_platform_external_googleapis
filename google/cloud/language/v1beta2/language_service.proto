@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc.
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,10 @@ syntax = "proto3";
 package google.cloud.language.v1beta2;
 
 import "google/api/annotations.proto";
-import "google/longrunning/operations.proto";
-import "google/protobuf/timestamp.proto";
-import "google/rpc/status.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/cloud/language/v1beta2;language";
+option go_package = "cloud.google.com/go/language/apiv1beta2/languagepb;languagepb";
 option java_multiple_files = true;
 option java_outer_classname = "LanguageServiceProto";
 option java_package = "com.google.cloud.language.v1beta2";
@@ -29,6 +28,11 @@ option java_package = "com.google.cloud.language.v1beta2";
 // Provides text analysis operations such as sentiment analysis and entity
 // recognition.
 service LanguageService {
+  option (google.api.default_host) = "language.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-language,"
+      "https://www.googleapis.com/auth/cloud-platform";
+
   // Analyzes the sentiment of the provided text.
   rpc AnalyzeSentiment(AnalyzeSentimentRequest)
       returns (AnalyzeSentimentResponse) {
@@ -36,6 +40,8 @@ service LanguageService {
       post: "/v1beta2/documents:analyzeSentiment"
       body: "*"
     };
+    option (google.api.method_signature) = "document,encoding_type";
+    option (google.api.method_signature) = "document";
   }
 
   // Finds named entities (currently proper names and common nouns) in the text
@@ -47,6 +53,8 @@ service LanguageService {
       post: "/v1beta2/documents:analyzeEntities"
       body: "*"
     };
+    option (google.api.method_signature) = "document,encoding_type";
+    option (google.api.method_signature) = "document";
   }
 
   // Finds entities, similar to
@@ -59,6 +67,8 @@ service LanguageService {
       post: "/v1beta2/documents:analyzeEntitySentiment"
       body: "*"
     };
+    option (google.api.method_signature) = "document,encoding_type";
+    option (google.api.method_signature) = "document";
   }
 
   // Analyzes the syntax of the text and provides sentence boundaries and
@@ -69,6 +79,8 @@ service LanguageService {
       post: "/v1beta2/documents:analyzeSyntax"
       body: "*"
     };
+    option (google.api.method_signature) = "document,encoding_type";
+    option (google.api.method_signature) = "document";
   }
 
   // Classifies a document into categories.
@@ -77,6 +89,16 @@ service LanguageService {
       post: "/v1beta2/documents:classifyText"
       body: "*"
     };
+    option (google.api.method_signature) = "document";
+  }
+
+  // Moderates a document for harmful and sensitive categories.
+  rpc ModerateText(ModerateTextRequest) returns (ModerateTextResponse) {
+    option (google.api.http) = {
+      post: "/v1beta2/documents:moderateText"
+      body: "*"
+    };
+    option (google.api.method_signature) = "document";
   }
 
   // A convenience method that provides all syntax, sentiment, entity, and
@@ -86,11 +108,11 @@ service LanguageService {
       post: "/v1beta2/documents:annotateText"
       body: "*"
     };
+    option (google.api.method_signature) = "document,features,encoding_type";
+    option (google.api.method_signature) = "document,features";
   }
 }
 
-// ################################################################ #
-//
 // Represents the input to API methods.
 message Document {
   // The document types enum.
@@ -105,6 +127,19 @@ message Document {
     HTML = 2;
   }
 
+  // Ways of handling boilerplate detected in the document
+  enum BoilerplateHandling {
+    // The boilerplate handling is not specified.
+    BOILERPLATE_HANDLING_UNSPECIFIED = 0;
+
+    // Do not analyze detected boilerplate. Reference web URI is required for
+    // detecting boilerplate.
+    SKIP_BOILERPLATE = 1;
+
+    // Treat boilerplate the same as content.
+    KEEP_BOILERPLATE = 2;
+  }
+
   // Required. If the type is not set or is `TYPE_UNSPECIFIED`,
   // returns an `INVALID_ARGUMENT` error.
   Type type = 1;
@@ -113,6 +148,7 @@ message Document {
   // Google Cloud Storage URI.
   oneof source {
     // The content of the input in string format.
+    // Cloud audit logging exempt since it is based on user data.
     string content = 2;
 
     // The Google Cloud Storage URI where the file content is located.
@@ -125,12 +161,21 @@ message Document {
   // The language of the document (if not specified, the language is
   // automatically detected). Both ISO and BCP-47 language codes are
   // accepted.<br>
-  // [Language Support](/natural-language/docs/languages)
-  // lists currently supported languages for each API method.
-  // If the language (either specified by the caller or automatically detected)
-  // is not supported by the called API method, an `INVALID_ARGUMENT` error
-  // is returned.
+  // [Language
+  // Support](https://cloud.google.com/natural-language/docs/languages) lists
+  // currently supported languages for each API method. If the language (either
+  // specified by the caller or automatically detected) is not supported by the
+  // called API method, an `INVALID_ARGUMENT` error is returned.
   string language = 4;
+
+  // The web URI where the document comes from. This URI is not used for
+  // fetching the content, but as a hint for analyzing the document.
+  string reference_web_uri = 5;
+
+  // Indicates how detected boilerplate(e.g. advertisements, copyright
+  // declarations, banners) should be handled for this document. If not
+  // specified, boilerplate will be treated the same as content.
+  BoilerplateHandling boilerplate_handling = 6;
 }
 
 // Represents a sentence in the input document.
@@ -144,11 +189,40 @@ message Sentence {
   Sentiment sentiment = 2;
 }
 
+// Represents the text encoding that the caller uses to process the output.
+// Providing an `EncodingType` is recommended because the API provides the
+// beginning offsets for various outputs, such as tokens and mentions, and
+// languages that natively use different text encodings may access offsets
+// differently.
+enum EncodingType {
+  // If `EncodingType` is not specified, encoding-dependent information (such as
+  // `begin_offset`) will be set at `-1`.
+  NONE = 0;
+
+  // Encoding-dependent information (such as `begin_offset`) is calculated based
+  // on the UTF-8 encoding of the input. C++ and Go are examples of languages
+  // that use this encoding natively.
+  UTF8 = 1;
+
+  // Encoding-dependent information (such as `begin_offset`) is calculated based
+  // on the UTF-16 encoding of the input. Java and JavaScript are examples of
+  // languages that use this encoding natively.
+  UTF16 = 2;
+
+  // Encoding-dependent information (such as `begin_offset`) is calculated based
+  // on the UTF-32 encoding of the input. Python is an example of a language
+  // that uses this encoding natively.
+  UTF32 = 3;
+}
+
 // Represents a phrase in the text that is a known entity, such as
 // a person, an organization, or location. The API associates information, such
 // as salience and mentions, with entities.
 message Entity {
-  // The type of the entity.
+  // The type of the entity. For most entity types, the associated metadata is a
+  // Wikipedia URL (`wikipedia_url`) and Knowledge Graph MID (`mid`). The table
+  // below lists the associated fields for entities that have different
+  // metadata.
   enum Type {
     // Unknown
     UNKNOWN = 0;
@@ -165,14 +239,63 @@ message Entity {
     // Event
     EVENT = 4;
 
-    // Work of art
+    // Artwork
     WORK_OF_ART = 5;
 
-    // Consumer goods
+    // Consumer product
     CONSUMER_GOOD = 6;
 
-    // Other types
+    // Other types of entities
     OTHER = 7;
+
+    // Phone number
+    //
+    // The metadata lists the phone number, formatted according to local
+    // convention, plus whichever additional elements appear in the text:
+    //
+    // * `number` - the actual number, broken down into sections as per local
+    // convention
+    // * `national_prefix` - country code, if detected
+    // * `area_code` - region or area code, if detected
+    // * `extension` - phone extension (to be dialed after connection), if
+    // detected
+    PHONE_NUMBER = 9;
+
+    // Address
+    //
+    // The metadata identifies the street number and locality plus whichever
+    // additional elements appear in the text:
+    //
+    // * `street_number` - street number
+    // * `locality` - city or town
+    // * `street_name` - street/route name, if detected
+    // * `postal_code` - postal code, if detected
+    // * `country` - country, if detected<
+    // * `broad_region` - administrative area, such as the state, if detected
+    // * `narrow_region` - smaller administrative area, such as county, if
+    // detected
+    // * `sublocality` - used in Asian addresses to demark a district within a
+    // city, if detected
+    ADDRESS = 10;
+
+    // Date
+    //
+    // The metadata identifies the components of the date:
+    //
+    // * `year` - four digit year, if detected
+    // * `month` - two digit month number, if detected
+    // * `day` - two digit day number, if detected
+    DATE = 11;
+
+    // Number
+    //
+    // The metadata is the number itself.
+    NUMBER = 12;
+
+    // Price
+    //
+    // The metadata identifies the `value` and `currency`.
+    PRICE = 13;
   }
 
   // The representative name for the entity.
@@ -183,8 +306,9 @@ message Entity {
 
   // Metadata associated with the entity.
   //
-  // Currently, Wikipedia URLs and Knowledge Graph MIDs are provided, if
-  // available. The associated keys are "wikipedia_url" and "mid", respectively.
+  // For most entity types, the metadata is a Wikipedia URL (`wikipedia_url`)
+  // and Knowledge Graph MID (`mid`), if they are available. For the metadata
+  // associated with other entity types, see the Type table below.
   map<string, string> metadata = 3;
 
   // The salience score associated with the entity in the [0, 1.0] range.
@@ -223,6 +347,7 @@ message Token {
 
 // Represents the feeling associated with the entire text or entities in
 // the text.
+// Next ID: 6
 message Sentiment {
   // A non-negative number in the [0, +inf) range, which represents
   // the absolute magnitude of sentiment regardless of score (positive or
@@ -877,10 +1002,47 @@ message ClassificationCategory {
   float confidence = 2;
 }
 
+// Model options available for classification requests.
+message ClassificationModelOptions {
+  // Options for the V1 model.
+  message V1Model {}
+
+  // Options for the V2 model.
+  message V2Model {
+    // The content categories used for classification.
+    enum ContentCategoriesVersion {
+      // If `ContentCategoriesVersion` is not specified, this option will
+      // default to `V1`.
+      CONTENT_CATEGORIES_VERSION_UNSPECIFIED = 0;
+
+      // Legacy content categories of our initial launch in 2017.
+      V1 = 1;
+
+      // Updated content categories in 2022.
+      V2 = 2;
+    }
+
+    // The content categories used for classification.
+    ContentCategoriesVersion content_categories_version = 1;
+  }
+
+  // If this field is not set, then the `v1_model` will be used by default.
+  oneof model_type {
+    // Setting this field will use the V1 model and V1 content categories
+    // version. The V1 model is a legacy model; support for this will be
+    // discontinued in the future.
+    V1Model v1_model = 1;
+
+    // Setting this field will use the V2 model with the appropriate content
+    // categories version. The V2 model is a better performing model.
+    V2Model v2_model = 2;
+  }
+}
+
 // The sentiment analysis request message.
 message AnalyzeSentimentRequest {
-  // Input document.
-  Document document = 1;
+  // Required. Input document.
+  Document document = 1 [(google.api.field_behavior) = REQUIRED];
 
   // The encoding type used by the API to calculate sentence offsets for the
   // sentence sentiment.
@@ -904,8 +1066,8 @@ message AnalyzeSentimentResponse {
 
 // The entity-level sentiment analysis request message.
 message AnalyzeEntitySentimentRequest {
-  // Input document.
-  Document document = 1;
+  // Required. Input document.
+  Document document = 1 [(google.api.field_behavior) = REQUIRED];
 
   // The encoding type used by the API to calculate offsets.
   EncodingType encoding_type = 2;
@@ -925,8 +1087,8 @@ message AnalyzeEntitySentimentResponse {
 
 // The entity analysis request message.
 message AnalyzeEntitiesRequest {
-  // Input document.
-  Document document = 1;
+  // Required. Input document.
+  Document document = 1 [(google.api.field_behavior) = REQUIRED];
 
   // The encoding type used by the API to calculate offsets.
   EncodingType encoding_type = 2;
@@ -946,8 +1108,8 @@ message AnalyzeEntitiesResponse {
 
 // The syntax analysis request message.
 message AnalyzeSyntaxRequest {
-  // Input document.
-  Document document = 1;
+  // Required. Input document.
+  Document document = 1 [(google.api.field_behavior) = REQUIRED];
 
   // The encoding type used by the API to calculate offsets.
   EncodingType encoding_type = 2;
@@ -970,8 +1132,12 @@ message AnalyzeSyntaxResponse {
 
 // The document classification request message.
 message ClassifyTextRequest {
-  // Input document.
-  Document document = 1;
+  // Required. Input document.
+  Document document = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Model options to use for classification. Defaults to v1 options if not
+  // specified.
+  ClassificationModelOptions classification_model_options = 3;
 }
 
 // The document classification response message.
@@ -980,11 +1146,24 @@ message ClassifyTextResponse {
   repeated ClassificationCategory categories = 1;
 }
 
+// The document moderation request message.
+message ModerateTextRequest {
+  // Required. Input document.
+  Document document = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The document moderation response message.
+message ModerateTextResponse {
+  // Harmful and sensitive categories representing the input document.
+  repeated ClassificationCategory moderation_categories = 1;
+}
+
 // The request message for the text annotation API, which can perform multiple
 // analysis types (sentiment, entities, and syntax) in one call.
 message AnnotateTextRequest {
   // All available features for sentiment, syntax, and semantic analysis.
   // Setting each one to true will enable that specific analysis for the input.
+  // Next ID: 12
   message Features {
     // Extract syntax information.
     bool extract_syntax = 1;
@@ -998,15 +1177,25 @@ message AnnotateTextRequest {
     // Extract entities and their associated sentiment.
     bool extract_entity_sentiment = 4;
 
-    // Classify the full document into categories.
+    // Classify the full document into categories. If this is true,
+    // the API will use the default model which classifies into a
+    // [predefined
+    // taxonomy](https://cloud.google.com/natural-language/docs/categories).
     bool classify_text = 6;
+
+    // Moderate the document for harmful and sensitive categories.
+    bool moderate_text = 11;
+
+    // The model options to use for classification. Defaults to v1 options
+    // if not specified. Only used if `classify_text` is set to true.
+    ClassificationModelOptions classification_model_options = 10;
   }
 
-  // Input document.
-  Document document = 1;
+  // Required. Input document.
+  Document document = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // The enabled features.
-  Features features = 2;
+  // Required. The enabled features.
+  Features features = 2 [(google.api.field_behavior) = REQUIRED];
 
   // The encoding type used by the API to calculate offsets.
   EncodingType encoding_type = 3;
@@ -1040,30 +1229,7 @@ message AnnotateTextResponse {
 
   // Categories identified in the input document.
   repeated ClassificationCategory categories = 6;
-}
 
-// Represents the text encoding that the caller uses to process the output.
-// Providing an `EncodingType` is recommended because the API provides the
-// beginning offsets for various outputs, such as tokens and mentions, and
-// languages that natively use different text encodings may access offsets
-// differently.
-enum EncodingType {
-  // If `EncodingType` is not specified, encoding-dependent information (such as
-  // `begin_offset`) will be set at `-1`.
-  NONE = 0;
-
-  // Encoding-dependent information (such as `begin_offset`) is calculated based
-  // on the UTF-8 encoding of the input. C++ and Go are examples of languages
-  // that use this encoding natively.
-  UTF8 = 1;
-
-  // Encoding-dependent information (such as `begin_offset`) is calculated based
-  // on the UTF-16 encoding of the input. Java and Javascript are examples of
-  // languages that use this encoding natively.
-  UTF16 = 2;
-
-  // Encoding-dependent information (such as `begin_offset`) is calculated based
-  // on the UTF-32 encoding of the input. Python is an example of a language
-  // that uses this encoding natively.
-  UTF32 = 3;
+  // Harmful and sensitive categories identified in the input document.
+  repeated ClassificationCategory moderation_categories = 8;
 }
