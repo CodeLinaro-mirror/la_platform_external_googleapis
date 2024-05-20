@@ -25,6 +25,8 @@ java_library_host {
         include_dirs: ["external/protobuf/src"],
         type: "full",
     },
+    // TODO(b/339514031): Unpin tradefed dependencies to Java 11.
+    java_version: "11",
 }
 
 java_library_host {
@@ -42,4 +44,6 @@ java_library_host {
         "guava",
         "javax-annotation-api-prebuilt-host-jar",
     ],
+    // TODO(b/339514031): Unpin tradefed dependencies to Java 11.
+    java_version: "11",
 }
