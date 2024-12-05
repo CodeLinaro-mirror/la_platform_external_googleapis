@@ -89,3 +89,19 @@ java_library_host {
     // TODO(b/339514031): Unpin tradefed dependencies to Java 11.
     java_version: "11",
 }
+
+java_library_host {
+    name: "googleapis-field-behavior-java-proto",
+    srcs: [
+        "field_behavior.proto",
+    ],
+    proto: {
+        include_dirs: [
+            "external/googleapis",
+            "external/protobuf/src",
+        ],
+        type: "full",
+    },
+    // TODO(b/339514031): Unpin tradefed dependencies to Java 11.
+    java_version: "11",
+}
