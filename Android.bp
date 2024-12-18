@@ -16,39 +16,27 @@ package {
     default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
-java_library_host {
-    name: "googleapis-status-java-proto",
+cc_library {
+    name: "libgoogleapis-status-proto",
+    visibility: [
+        "//device/google/cuttlefish:__subpackages__",
+    ],
     srcs: [
-        "status.proto",
+        "google/rpc/code.proto",
+        "google/rpc/status.proto",
+        ":libprotobuf-internal-any-proto",
     ],
-    libs: [
-        "libprotobuf-java-full",
-    ],
+    host_supported: true,
     proto: {
+        canonical_path_from_root: false,
+        export_proto_headers: true,
         include_dirs: [
             "external/googleapis",
             "external/protobuf/src",
         ],
         type: "full",
     },
-    // TODO(b/339514031): Unpin tradefed dependencies to Java 11.
-    java_version: "11",
-}
-
-java_library {
-    name: "googleapis-status-java-proto-lite",
-    srcs: [
-        "status.proto",
-        ":libprotobuf-internal-any-proto",
+    shared_libs: [
+        "libprotobuf-cpp-full",
     ],
-    libs: [
-        "libprotobuf-java-lite",
-    ],
-    proto: {
-        include_dirs: [
-            "external/googleapis",
-            "external/protobuf/src",
-        ],
-        type: "lite",
-    },
 }
