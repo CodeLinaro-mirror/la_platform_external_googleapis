@@ -39,4 +39,5 @@ cc_library {
     shared_libs: [
         "libprotobuf-cpp-full",
     ],
+    vendor_available: true,
 }
