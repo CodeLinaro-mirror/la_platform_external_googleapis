@@ -27,6 +27,7 @@ cc_library {
         ":libprotobuf-internal-any-proto",
     ],
     host_supported: true,
+    vendor_available: true,
     proto: {
         canonical_path_from_root: false,
         export_proto_headers: true,
@@ -39,5 +40,30 @@ cc_library {
     shared_libs: [
         "libprotobuf-cpp-full",
     ],
-    vendor_available: true,
+}
+
+java_library_host {
+    name: "libgoogleapis-status-proto-java",
+    visibility: [
+        "//external/grpc-grpc-java:__subpackages__",
+    ],
+    srcs: [
+        "google/rpc/code.proto",
+        "google/rpc/status.proto",
+        ":libprotobuf-internal-any-proto",
+    ],
+    proto: {
+        include_dirs: [
+            "external/googleapis",
+            "external/protobuf/src",
+        ],
+        type: "full",
+    },
+    // b/267831518: Pin tradefed and dependencies to Java 11.
+    java_version: "11",
+    target: {
+        windows: {
+            enabled: true,
+        },
+    },
 }
