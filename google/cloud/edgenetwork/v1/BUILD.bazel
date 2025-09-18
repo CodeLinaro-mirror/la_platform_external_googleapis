@@ -116,12 +116,11 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "go_gapic_assembly_pkg",
     "go_gapic_library",
-    "go_proto_library",
+    "go_grpc_library",
 )
 
-go_proto_library(
+go_grpc_library(
     name = "edgenetwork_go_proto",
-    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
     importpath = "cloud.google.com/go/edgenetwork/apiv1/edgenetworkpb",
     protos = [":edgenetwork_proto"],
     deps = [
@@ -136,7 +135,7 @@ go_gapic_library(
     grpc_service_config = "edgenetwork_grpc_service_config.json",
     importpath = "cloud.google.com/go/edgenetwork/apiv1;edgenetwork",
     metadata = True,
-    release_level = "beta",
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "edgenetwork_v1.yaml",
     transport = "grpc+rest",

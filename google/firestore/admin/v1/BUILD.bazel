@@ -32,12 +32,15 @@ proto_library(
         "location.proto",
         "operation.proto",
         "schedule.proto",
+        "snapshot.proto",
+        "user_creds.proto",
     ],
     deps = [
         "//google/api:annotations_proto",
         "//google/api:client_proto",
         "//google/api:field_behavior_proto",
         "//google/api:resource_proto",
+        "//google/api:routing_proto",
         "//google/longrunning:operations_proto",
         "//google/type:dayofweek_proto",
         "@com_google_protobuf//:duration_proto",
@@ -358,7 +361,6 @@ load(
 
 csharp_proto_library(
     name = "admin_csharp_proto",
-    extra_opts = [],
     deps = [":admin_proto"],
 )
 

@@ -25,12 +25,16 @@ proto_library(
     name = "dataplex_proto",
     srcs = [
         "analyze.proto",
+        "business_glossary.proto",
         "catalog.proto",
+        "cmek.proto",
         "content.proto",
+        "data_discovery.proto",
         "data_profile.proto",
         "data_quality.proto",
         "data_taxonomy.proto",
         "datascans.proto",
+        "datascans_common.proto",
         "logs.proto",
         "metadata.proto",
         "processing.proto",
@@ -43,6 +47,7 @@ proto_library(
         "//google/api:annotations_proto",
         "//google/api:client_proto",
         "//google/api:field_behavior_proto",
+        "//google/api:field_info_proto",
         "//google/api:resource_proto",
         "//google/iam/v1:iam_policy_proto",
         "//google/iam/v1:policy_proto",
@@ -113,8 +118,12 @@ java_gapic_library(
 java_gapic_test(
     name = "dataplex_java_gapic_test_suite",
     test_classes = [
+        "com.google.cloud.dataplex.v1.BusinessGlossaryServiceClientHttpJsonTest",
+        "com.google.cloud.dataplex.v1.BusinessGlossaryServiceClientTest",
         "com.google.cloud.dataplex.v1.CatalogServiceClientHttpJsonTest",
         "com.google.cloud.dataplex.v1.CatalogServiceClientTest",
+        "com.google.cloud.dataplex.v1.CmekServiceClientHttpJsonTest",
+        "com.google.cloud.dataplex.v1.CmekServiceClientTest",
         "com.google.cloud.dataplex.v1.ContentServiceClientHttpJsonTest",
         "com.google.cloud.dataplex.v1.ContentServiceClientTest",
         "com.google.cloud.dataplex.v1.DataScanServiceClientHttpJsonTest",
@@ -150,12 +159,11 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "go_gapic_assembly_pkg",
     "go_gapic_library",
-    "go_proto_library",
+    "go_grpc_library",
 )
 
-go_proto_library(
+go_grpc_library(
     name = "dataplex_go_proto",
-    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
     importpath = "cloud.google.com/go/dataplex/apiv1/dataplexpb",
     protos = [":dataplex_proto"],
     deps = [
@@ -174,7 +182,7 @@ go_gapic_library(
     release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "dataplex_v1.yaml",
-    transport = "grpc",
+    transport = "grpc+rest",
     deps = [
         ":dataplex_go_proto",
         "//google/cloud/location:location_go_proto",
@@ -216,7 +224,7 @@ py_gapic_library(
     grpc_service_config = "dataplex_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "dataplex_v1.yaml",
-    transport = "grpc",
+    transport = "grpc+rest",
     deps = [
         "//google/iam/v1:iam_policy_py_proto",
     ],
@@ -260,7 +268,7 @@ php_gapic_library(
     name = "dataplex_php_gapic",
     srcs = [":dataplex_proto_with_info"],
     grpc_service_config = "dataplex_grpc_service_config.json",
-    migration_mode = "MIGRATING",
+    migration_mode = "NEW_SURFACE_ONLY",
     rest_numeric_enums = True,
     service_yaml = "dataplex_v1.yaml",
     transport = "grpc+rest",
@@ -298,7 +306,7 @@ nodejs_gapic_library(
     package = "google.cloud.dataplex.v1",
     rest_numeric_enums = True,
     service_yaml = "dataplex_v1.yaml",
-    transport = "grpc",
+    transport = "grpc+rest",
     deps = [],
 )
 
@@ -378,6 +386,7 @@ load(
 
 csharp_proto_library(
     name = "dataplex_csharp_proto",
+    extra_opts = [],
     deps = [":dataplex_proto"],
 )
 
