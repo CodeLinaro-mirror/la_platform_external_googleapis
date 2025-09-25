@@ -5,6 +5,7 @@ title: AlloyDB API
 
 apis:
 - name: google.cloud.alloydb.v1beta.AlloyDBAdmin
+- name: google.cloud.alloydb.v1beta.AlloyDBCSQLAdmin
 - name: google.cloud.location.Locations
 - name: google.iam.v1.IAMPolicy
 - name: google.longrunning.Operations
@@ -12,6 +13,7 @@ apis:
 types:
 - name: google.cloud.alloydb.v1beta.BatchCreateInstancesResponse
 - name: google.cloud.alloydb.v1beta.OperationMetadata
+- name: google.cloud.alloydb.v1beta.UpgradeClusterResponse
 
 documentation:
   summary: |-
@@ -74,6 +76,10 @@ http:
 authentication:
   rules:
   - selector: 'google.cloud.alloydb.v1beta.AlloyDBAdmin.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: google.cloud.alloydb.v1beta.AlloyDBCSQLAdmin.RestoreFromCloudSQL
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform

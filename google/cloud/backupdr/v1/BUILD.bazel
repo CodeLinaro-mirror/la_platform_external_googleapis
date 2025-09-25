@@ -25,15 +25,30 @@ proto_library(
     name = "backupdr_proto",
     srcs = [
         "backupdr.proto",
+        "backupplan.proto",
+        "backupplanassociation.proto",
+        "backupvault.proto",
+        "backupvault_ba.proto",
+        "backupvault_cloudsql.proto",
+        "backupvault_disk.proto",
+        "backupvault_gce.proto",
+        "datasourcereference.proto",
     ],
     deps = [
         "//google/api:annotations_proto",
         "//google/api:client_proto",
         "//google/api:field_behavior_proto",
+        "//google/api:field_info_proto",
         "//google/api:resource_proto",
         "//google/longrunning:operations_proto",
+        "//google/rpc:status_proto",
+        "//google/type:dayofweek_proto",
+        "//google/type:month_proto",
+        "@com_google_protobuf//:duration_proto",
         "@com_google_protobuf//:empty_proto",
+        "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:timestamp_proto",
+        "@com_google_protobuf//:wrappers_proto",
     ],
 )
 
@@ -41,8 +56,8 @@ proto_library_with_info(
     name = "backupdr_proto_with_info",
     deps = [
         ":backupdr_proto",
-        "//google/cloud/location:location_proto",
         "//google/cloud:common_resources_proto",
+        "//google/cloud/location:location_proto",
         "//google/iam/v1:iam_policy_proto",
     ],
 )
@@ -79,9 +94,9 @@ java_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "backupdr_v1.yaml",
     test_deps = [
+        ":backupdr_java_grpc",
         "//google/cloud/location:location_java_grpc",
         "//google/iam/v1:iam_java_grpc",
-        ":backupdr_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
@@ -104,6 +119,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-backupdr-v1-java",
+    include_samples = True,
     transport = "grpc+rest",
     deps = [
         ":backupdr_java_gapic",
@@ -111,7 +127,6 @@ java_gapic_assembly_gradle_pkg(
         ":backupdr_java_proto",
         ":backupdr_proto",
     ],
-    include_samples = True,
 )
 
 ##############################################################################
@@ -122,17 +137,19 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "go_gapic_assembly_pkg",
     "go_gapic_library",
-    "go_proto_library",
+    "go_grpc_library",
 )
 
-go_proto_library(
+go_grpc_library(
     name = "backupdr_go_proto",
-    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
     importpath = "cloud.google.com/go/backupdr/apiv1/backupdrpb",
     protos = [":backupdr_proto"],
     deps = [
         "//google/api:annotations_go_proto",
         "//google/longrunning:longrunning_go_proto",
+        "//google/rpc:status_go_proto",
+        "//google/type:dayofweek_go_proto",
+        "//google/type:month_go_proto",
     ],
 )
 
@@ -142,7 +159,7 @@ go_gapic_library(
     grpc_service_config = "backupdr_grpc_service_config.json",
     importpath = "cloud.google.com/go/backupdr/apiv1;backupdr",
     metadata = True,
-    release_level = "beta",
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "backupdr_v1.yaml",
     transport = "grpc+rest",
@@ -153,6 +170,7 @@ go_gapic_library(
         "//google/longrunning:longrunning_go_proto",
         "@com_google_cloud_go_longrunning//:go_default_library",
         "@com_google_cloud_go_longrunning//autogen:go_default_library",
+        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
     ],
 )
 
@@ -161,9 +179,9 @@ go_gapic_assembly_pkg(
     name = "gapi-cloud-backupdr-v1-go",
     deps = [
         ":backupdr_go_gapic",
-        ":backupdr_go_gapic_srcjar-test.srcjar",
         ":backupdr_go_gapic_srcjar-metadata.srcjar",
         ":backupdr_go_gapic_srcjar-snippets.srcjar",
+        ":backupdr_go_gapic_srcjar-test.srcjar",
         ":backupdr_go_proto",
     ],
 )
@@ -229,8 +247,8 @@ php_gapic_library(
     name = "backupdr_php_gapic",
     srcs = [":backupdr_proto_with_info"],
     grpc_service_config = "backupdr_grpc_service_config.json",
-    rest_numeric_enums = True,
     migration_mode = "NEW_SURFACE_ONLY",
+    rest_numeric_enums = True,
     service_yaml = "backupdr_v1.yaml",
     transport = "grpc+rest",
     deps = [
@@ -284,8 +302,8 @@ nodejs_gapic_assembly_pkg(
 # buildifier: disable=same-origin-load
 load(
     "@com_google_googleapis_imports//:imports.bzl",
-    "ruby_gapic_assembly_pkg",
     "ruby_cloud_gapic_library",
+    "ruby_gapic_assembly_pkg",
     "ruby_grpc_library",
     "ruby_proto_library",
 )
@@ -307,7 +325,7 @@ ruby_cloud_gapic_library(
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-cloud-backupdr-v1",
         "ruby-cloud-namespace-override=Backupdr=BackupDR",
-        "ruby-cloud-path-override=backup_dr=backupdr"
+        "ruby-cloud-path-override=backup_dr=backupdr",
     ],
     grpc_service_config = "backupdr_grpc_service_config.json",
     rest_numeric_enums = True,
@@ -343,7 +361,6 @@ load(
 
 csharp_proto_library(
     name = "backupdr_csharp_proto",
-    extra_opts = [],
     deps = [":backupdr_proto"],
 )
 

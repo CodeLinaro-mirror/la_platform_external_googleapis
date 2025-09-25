@@ -11,6 +11,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+    "nodejs_gapic_combined_pkg"
 )
 
 # Generates a Ruby wrapper client for IDS.
@@ -21,7 +22,7 @@ ruby_cloud_gapic_library(
     srcs = ["//google/cloud/ids/v1:ids_proto_with_info"],
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-cloud-ids",
-        "ruby-cloud-wrapper-of=v1:0.6",
+        "ruby-cloud-wrapper-of=v1:2.0",
         "ruby-cloud-product-url=https://cloud.google.com/intrusion-detection-system/",
         "ruby-cloud-api-id=ids.googleapis.com",
         "ruby-cloud-api-shortname=ids",
@@ -37,5 +38,14 @@ ruby_gapic_assembly_pkg(
     name = "google-cloud-ids-ruby",
     deps = [
         ":ids_ruby_wrapper",
+    ],
+)
+
+nodejs_gapic_combined_pkg(
+    name = "google-cloud-ids-nodejs",
+    default_version = "v1",
+    templates_excludes = ["package.json"],
+    deps = [
+        "//google/cloud/ids/v1:ids-v1-nodejs"
     ],
 )

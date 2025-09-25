@@ -66,6 +66,7 @@ def switched_rules_by_language(
         ruby = False,
         csharp = False,
         go_test = False,
+        upb = False,
         rules_override = {}):
     """Switches rules in the generated imports.bzl between no-op and the actual implementation.
 
@@ -221,6 +222,15 @@ def switched_rules_by_language(
     rules["cc_gapic_library"] = _switch(False)
 
     #
+    # upb
+    #
+    rules["upb_c_proto_library"] = _switch(
+        upb,
+        "@com_google_protobuf//bazel:upb_c_proto_library.bzl",
+        "upb_c_proto_library",
+    )
+
+    #
     # PHP
     #
     rules["php_proto_library"] = _switch(
@@ -256,6 +266,11 @@ def switched_rules_by_language(
         nodejs and grpc and gapic,
         "@gapic_generator_typescript//rules_typescript_gapic:typescript_gapic_pkg.bzl",
         "typescript_gapic_assembly_pkg",
+    )
+    rules["nodejs_gapic_combined_pkg"] = _switch(
+        nodejs and grpc and gapic,
+        "@gapic_generator_typescript//rules_typescript_gapic:typescript_gapic_combined_pkg.bzl",
+        "typescript_gapic_combined_pkg",
     )
 
     #

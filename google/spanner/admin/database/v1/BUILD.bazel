@@ -9,10 +9,6 @@
 #    * extra_protoc_file_parameters
 # The complete list of preserved parameters can be found in the source code.
 
-##############################################################################
-# Common
-##############################################################################
-load("@rules_proto//proto:defs.bzl", "proto_library")
 load(
     "@com_google_googleapis_imports//:imports.bzl",
     "cc_grpc_library",
@@ -44,6 +40,11 @@ load(
     "ruby_proto_library",
 )
 
+##############################################################################
+# Common
+##############################################################################
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
 # This is an API workspace, having public visibility by default makes perfect sense.
 package(default_visibility = ["//visibility:public"])
 
@@ -51,6 +52,7 @@ proto_library(
     name = "database_proto",
     srcs = [
         "backup.proto",
+        "backup_schedule.proto",
         "common.proto",
         "spanner_database_admin.proto",
     ],
@@ -63,8 +65,10 @@ proto_library(
         "//google/iam/v1:policy_proto",
         "//google/longrunning:operations_proto",
         "//google/rpc:status_proto",
+        "@com_google_protobuf//:duration_proto",
         "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
+        "@com_google_protobuf//:struct_proto",
         "@com_google_protobuf//:timestamp_proto",
     ],
 )
@@ -91,7 +95,7 @@ java_grpc_library(
 java_gapic_library(
     name = "database_java_gapic",
     srcs = [":database_proto_with_info"],
-    gapic_yaml = "spanner_admin_database_gapic.yaml",
+    gapic_yaml = "spanner_gapic.yaml",
     grpc_service_config = "spanner_admin_database_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "spanner.yaml",
@@ -212,12 +216,12 @@ php_proto_library(
 php_gapic_library(
     name = "database_php_gapic",
     srcs = [":database_proto_with_info"],
-    gapic_yaml = "spanner_admin_database_gapic.yaml",
+    gapic_yaml = "spanner_gapic.yaml",
     grpc_service_config = "spanner_admin_database_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "spanner.yaml",
     transport = "grpc+rest",
-    migration_mode = "MIGRATING",
     deps = [":database_php_proto"],
 )
 

@@ -10,7 +10,6 @@ documentation:
   summary: |-
     Help protect your website from fraudulent activity, spam, and abuse without
     creating friction.
-  overview: reCAPTCHA Enterprise Overview
 
 authentication:
   rules:
@@ -22,3 +21,9 @@ authentication:
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform
+
+publishing:
+  library_settings:
+  - version: google.cloud.recaptchaenterprise.v1beta1
+    java_settings:
+      library_package: com.google.cloud.recaptchaenterprise.v1beta1
