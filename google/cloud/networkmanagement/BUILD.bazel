@@ -11,6 +11,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+    "nodejs_gapic_combined_pkg"
 )
 
 # Generates a Ruby wrapper client for networkmanagement.
@@ -21,7 +22,7 @@ ruby_cloud_gapic_library(
     srcs = ["//google/cloud/networkmanagement/v1:networkmanagement_proto_with_info"],
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-cloud-network_management",
-        "ruby-cloud-wrapper-of=v1:0.10",
+        "ruby-cloud-wrapper-of=v1:2.0",
         "ruby-cloud-product-url=https://cloud.google.com/network-intelligence-center/docs/connectivity-tests/reference/networkmanagement/rest",
         "ruby-cloud-api-id=networkmanagement.googleapis.com",
         "ruby-cloud-api-shortname=networkmanagement",
@@ -36,5 +37,15 @@ ruby_gapic_assembly_pkg(
     name = "google-cloud-networkmanagement-ruby",
     deps = [
         ":networkmanagement_ruby_wrapper",
+    ],
+)
+
+nodejs_gapic_combined_pkg(
+    name = "google-cloud-networkmanagement-nodejs",
+    default_version = "v1",
+    templates_excludes = ["package.json"],
+    deps = [
+        "//google/cloud/networkmanagement/v1:networkmanagement-v1-nodejs",
+        "//google/cloud/networkmanagement/v1beta1:networkmanagement-v1beta1-nodejs"
     ],
 )

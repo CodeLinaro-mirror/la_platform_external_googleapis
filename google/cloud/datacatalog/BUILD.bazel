@@ -11,6 +11,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+    "nodejs_gapic_combined_pkg"
 )
 
 # Generates a Ruby wrapper client for datacatalog.
@@ -22,7 +23,7 @@ ruby_cloud_gapic_library(
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-cloud-data_catalog",
         "ruby-cloud-env-prefix=DATA_CATALOG",
-        "ruby-cloud-wrapper-of=v1:0.21",
+        "ruby-cloud-wrapper-of=v1:2.0",
         "ruby-cloud-product-url=https://cloud.google.com/data-catalog",
         "ruby-cloud-api-id=datacatalog.googleapis.com",
         "ruby-cloud-api-shortname=datacatalog",
@@ -37,5 +38,15 @@ ruby_gapic_assembly_pkg(
     name = "google-cloud-datacatalog-ruby",
     deps = [
         ":datacatalog_ruby_wrapper",
+    ],
+)
+
+nodejs_gapic_combined_pkg(
+    name = "google-cloud-datacatalog-nodejs",
+    default_version = "v1",
+    templates_excludes = ["package.json", "linkinator.config.json", ".mocharc.json"],
+    deps = [
+        "//google/cloud/datacatalog/v1:datacatalog-v1-nodejs",
+        "//google/cloud/datacatalog/v1beta1:datacatalog-v1beta1-nodejs"
     ],
 )

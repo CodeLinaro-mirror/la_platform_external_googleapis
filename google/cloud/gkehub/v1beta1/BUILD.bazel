@@ -72,7 +72,6 @@ java_grpc_library(
 java_gapic_library(
     name = "gkehub_java_gapic",
     srcs = [":gkehub_proto_with_info"],
-    gapic_yaml = "memberships_gapic.yaml",
     grpc_service_config = "membership_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "gkehub_v1beta1.yaml",
@@ -119,12 +118,11 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "go_gapic_assembly_pkg",
     "go_gapic_library",
-    "go_proto_library",
+    "go_grpc_library",
 )
 
-go_proto_library(
+go_grpc_library(
     name = "gkehub_go_proto",
-    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
     importpath = "cloud.google.com/go/gkehub/apiv1beta1/gkehubpb",
     protos = [":gkehub_proto"],
     deps = [

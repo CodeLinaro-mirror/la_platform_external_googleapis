@@ -11,6 +11,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+    "nodejs_gapic_combined_pkg"
 )
 
 # Generates a Ruby wrapper client for storageinsights.
@@ -21,7 +22,7 @@ ruby_cloud_gapic_library(
     srcs = ["//google/cloud/storageinsights/v1:storageinsights_proto_with_info"],
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-cloud-storage_insights",
-        "ruby-cloud-wrapper-of=v1:0.4",
+        "ruby-cloud-wrapper-of=v1:1.0",
     ],
     service_yaml = "//google/cloud/storageinsights/v1:storageinsights_v1.yaml",
     transport = "grpc+rest",
@@ -32,5 +33,14 @@ ruby_gapic_assembly_pkg(
     name = "google-cloud-storageinsights-ruby",
     deps = [
         ":storageinsights_ruby_wrapper",
+    ],
+)
+
+nodejs_gapic_combined_pkg(
+    name = "google-cloud-storageinsights-nodejs",
+    default_version = "v1",
+    templates_excludes = ["package.json"],
+    deps = [
+        "//google/cloud/storageinsights/v1:storageinsights-v1-nodejs"
     ],
 )

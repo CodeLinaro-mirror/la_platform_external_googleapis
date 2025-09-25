@@ -11,6 +11,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+    "nodejs_gapic_combined_pkg"
 )
 
 # Generates a Ruby wrapper client for run.
@@ -21,7 +22,7 @@ ruby_cloud_gapic_library(
     srcs = ["//google/cloud/run/v2:run_proto_with_info"],
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-cloud-run",
-        "ruby-cloud-wrapper-of=v2:0.13",
+        "ruby-cloud-wrapper-of=v2:0.17",
         "ruby-cloud-product-url=https://cloud.google.com/run",
         "ruby-cloud-api-id=run.googleapis.com",
         "ruby-cloud-api-shortname=run",
@@ -36,5 +37,14 @@ ruby_gapic_assembly_pkg(
     name = "google-cloud-run-ruby",
     deps = [
         ":run_ruby_wrapper",
+    ],
+)
+
+nodejs_gapic_combined_pkg(
+    name = "google-cloud-run-nodejs",
+    default_version = "v2",
+    templates_excludes = ["package.json"],
+    deps = [
+        "//google/cloud/run/v2:run-v2-nodejs"
     ],
 )

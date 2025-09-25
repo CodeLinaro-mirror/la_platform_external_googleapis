@@ -9,6 +9,9 @@ apis:
 - name: google.pubsub.v1.SchemaService
 - name: google.pubsub.v1.Subscriber
 
+types:
+- name: google.pubsub.v1.IngestionFailureEvent
+
 documentation:
   summary: |-
     Provides reliable, many-to-many, asynchronous messaging between
@@ -90,6 +93,7 @@ authentication:
         https://www.googleapis.com/auth/pubsub
 
 publishing:
+  new_issue_uri: https://issuetracker.google.com/issues/new?component=187173
   documentation_uri: https://cloud.google.com/pubsub/docs
   github_label: 'api: pubsub'
   organization: CLOUD
@@ -99,4 +103,8 @@ publishing:
       renamed_services:
         Subscriber: SubscriberServiceApi
         Publisher: PublisherServiceApi
+    go_settings:
+      renamed_services:
+        Publisher: TopicAdmin
+        Subscriber: SubscriptionAdmin
   proto_reference_documentation_uri: https://cloud.google.com/pubsub/docs/reference/rpc
