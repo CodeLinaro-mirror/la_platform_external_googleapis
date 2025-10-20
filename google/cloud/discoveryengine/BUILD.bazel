@@ -11,6 +11,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+    "nodejs_gapic_combined_pkg"
 )
 
 # Generates a Ruby wrapper client for discoveryengine.
@@ -21,7 +22,7 @@ ruby_cloud_gapic_library(
     srcs = ["//google/cloud/discoveryengine/v1:discoveryengine_proto_with_info"],
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-cloud-discovery_engine",
-        "ruby-cloud-wrapper-of=v1:0.4;v1beta:0.7",
+        "ruby-cloud-wrapper-of=v1:2.0",
     ],
     service_yaml = "//google/cloud/discoveryengine/v1:discoveryengine_v1.yaml",
     transport = "grpc+rest",
@@ -32,5 +33,15 @@ ruby_gapic_assembly_pkg(
     name = "google-cloud-discoveryengine-ruby",
     deps = [
         ":discoveryengine_ruby_wrapper",
+    ],
+)
+nodejs_gapic_combined_pkg(
+    name = "google-cloud-discoveryengine-nodejs",
+    default_version = "v1",
+    templates_excludes = ["package.json"],
+    deps = [
+        "//google/cloud/discoveryengine/v1:discoveryengine-v1-nodejs",
+        "//google/cloud/discoveryengine/v1alpha:discoveryengine-v1alpha-nodejs",
+        "//google/cloud/discoveryengine/v1beta:discoveryengine-v1beta-nodejs"
     ],
 )

@@ -11,6 +11,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+    "nodejs_gapic_combined_pkg"
 )
 
 # Generates a Ruby wrapper client for securesourcemanager.
@@ -21,7 +22,7 @@ ruby_cloud_gapic_library(
     srcs = ["//google/cloud/securesourcemanager/v1:securesourcemanager_proto_with_info"],
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-cloud-secure_source_manager",
-        "ruby-cloud-wrapper-of=v1:0.2",
+        "ruby-cloud-wrapper-of=v1:2.0",
     ],
     service_yaml = "//google/cloud/securesourcemanager/v1:securesourcemanager_v1.yaml",
     transport = "grpc+rest",
@@ -32,5 +33,14 @@ ruby_gapic_assembly_pkg(
     name = "google-cloud-securesourcemanager-ruby",
     deps = [
         ":securesourcemanager_ruby_wrapper",
+    ],
+)
+
+nodejs_gapic_combined_pkg(
+    name = "google-cloud-securesourcemanager-nodejs",
+    default_version = "v1",
+    templates_excludes = ["package.json"],
+    deps = [
+        "//google/cloud/securesourcemanager/v1:securesourcemanager-v1-nodejs"
     ],
 )

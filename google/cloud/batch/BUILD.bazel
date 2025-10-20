@@ -11,6 +11,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+    "nodejs_gapic_combined_pkg"
 )
 
 # Generates a Ruby wrapper client for batch.
@@ -23,7 +24,7 @@ ruby_cloud_gapic_library(
         "ruby-cloud-api-id=batch.googleapis.com",
         "ruby-cloud-api-shortname=batch",
         "ruby-cloud-gem-name=google-cloud-batch",
-        "ruby-cloud-wrapper-of=v1:0.15",
+        "ruby-cloud-wrapper-of=v1:1.0",
     ],
     ruby_cloud_description = "Google Cloud Batch is a fully managed service used by scientists, VFX artists, developers to easily and efficiently run batch workloads on Google Cloud. This service manages provisioning of resources to satisfy the requirements of the batch jobs for a variety of workloads including ML, HPC, VFX rendering, transcoding, genomics and others.",
     ruby_cloud_title = "Batch",
@@ -35,5 +36,15 @@ ruby_gapic_assembly_pkg(
     name = "google-cloud-batch-ruby",
     deps = [
         ":batch_ruby_wrapper",
+    ],
+)
+
+nodejs_gapic_combined_pkg(
+    name = "google-cloud-batch-nodejs",
+    default_version = "v1",
+    templates_excludes = ["package.json"],
+    deps = [
+        "//google/cloud/batch/v1:batch-v1-nodejs",
+        "//google/cloud/batch/v1alpha:batch-v1alpha-nodejs"
     ],
 )

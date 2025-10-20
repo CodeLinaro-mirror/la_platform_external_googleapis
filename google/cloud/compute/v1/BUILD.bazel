@@ -43,6 +43,7 @@ proto_from_disco(
     name = "compute_gen",
     src = "compute.v1.json",
     enums_as_strings = True,
+    input_config_path = "compute.config.json",
     message_ignorelist = _MESSAGE_IGNORE_LIST,
     previous_proto = "compute.proto",
     service_ignorelist = _SERVICE_IGNORELIST,
@@ -51,6 +52,7 @@ proto_from_disco(
 grpc_service_config_from_disco(
     name = "compute_grpc_service_config_gen",
     src = "compute.v1.json",
+    input_config_path = "compute.config.json", 
     message_ignorelist = _MESSAGE_IGNORE_LIST,
     previous_proto = "compute.proto",
     service_ignorelist = _SERVICE_IGNORELIST,
@@ -59,6 +61,7 @@ grpc_service_config_from_disco(
 gapic_yaml_from_disco(
     name = "compute_gapic_gen",
     src = "compute.v1.json",
+    input_config_path = "compute.config.json",
     message_ignorelist = _MESSAGE_IGNORE_LIST,
     previous_proto = "compute.proto",
     service_ignorelist = _SERVICE_IGNORELIST,
@@ -83,6 +86,7 @@ proto_library(
         "@com_google_googleapis//google/cloud:extended_operations_proto",
         "@com_google_protobuf//:any_proto",
         "@com_google_protobuf//:descriptor_proto",
+        "@com_google_protobuf//:struct_proto",
     ],
 )
 
@@ -234,6 +238,8 @@ load(
 
 py_gapic_library(
     name = "compute_py_gapic",
+    rest_numeric_enums = False,
+    service_yaml = "compute_v1.yaml",
     srcs = [
         ":compute_proto",
     ],
@@ -281,7 +287,7 @@ php_gapic_library(
     grpc_service_config = "compute_grpc_service_config.json",
     service_yaml = "compute_v1.yaml",
     transport = "rest",
-    migration_mode = "MIGRATION_MODE_UNSPECIFIED",
+    migration_mode = "NEW_SURFACE_ONLY",
     deps = [
         ":compute_php_proto",
     ],
@@ -425,7 +431,6 @@ load(
 
 go_proto_library(
     name = "compute_go_proto",
-    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
     importpath = "cloud.google.com/go/compute/apiv1/computepb",
     protos = [":compute_proto"],
     deps = [

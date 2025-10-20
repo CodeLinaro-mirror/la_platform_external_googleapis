@@ -11,6 +11,8 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+
+    "nodejs_gapic_combined_pkg"
 )
 
 # Generates a Ruby wrapper client for dataplex.
@@ -21,7 +23,7 @@ ruby_cloud_gapic_library(
     srcs = ["//google/cloud/dataplex/v1:dataplex_proto_with_info"],
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-cloud-dataplex",
-        "ruby-cloud-wrapper-of=v1:0.18",
+        "ruby-cloud-wrapper-of=v1:2.0",
         "ruby-cloud-product-url=https://cloud.google.com/dataplex/",
         "ruby-cloud-api-id=dataplex.googleapis.com",
         "ruby-cloud-api-shortname=dataplex",
@@ -36,5 +38,14 @@ ruby_gapic_assembly_pkg(
     name = "google-cloud-dataplex-ruby",
     deps = [
         ":dataplex_ruby_wrapper",
+    ],
+)
+
+nodejs_gapic_combined_pkg(
+    name = "google-cloud-dataplex-nodejs",
+    default_version = "v1",
+    templates_excludes = ["package.json"],
+    deps = [
+        "//google/cloud/dataplex/v1:dataplex-v1-nodejs"
     ],
 )

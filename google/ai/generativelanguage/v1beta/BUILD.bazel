@@ -24,6 +24,8 @@ load("@rules_proto//proto:defs.bzl", "proto_library")
 proto_library(
     name = "generativelanguage_proto",
     srcs = [
+        "cache_service.proto",
+        "cached_content.proto",
         "citation.proto",
         "content.proto",
         "discuss_service.proto",
@@ -34,6 +36,7 @@ proto_library(
         "model_service.proto",
         "permission.proto",
         "permission_service.proto",
+        "prediction_service.proto",
         "retriever.proto",
         "retriever_service.proto",
         "safety.proto",
@@ -46,10 +49,15 @@ proto_library(
         "//google/api:field_behavior_proto",
         "//google/api:resource_proto",
         "//google/longrunning:operations_proto",
+        "//google/rpc:status_proto",
+        "//google/type:interval_proto",
+        "//google/type:latlng_proto",
+        "@com_google_protobuf//:duration_proto",
         "@com_google_protobuf//:empty_proto",
         "@com_google_protobuf//:field_mask_proto",
         "@com_google_protobuf//:struct_proto",
         "@com_google_protobuf//:timestamp_proto",
+        "@com_google_protobuf//:wrappers_proto",
     ],
 )
 
@@ -105,6 +113,8 @@ java_gapic_library(
 java_gapic_test(
     name = "generativelanguage_java_gapic_test_suite",
     test_classes = [
+        "com.google.ai.generativelanguage.v1beta.CacheServiceClientHttpJsonTest",
+        "com.google.ai.generativelanguage.v1beta.CacheServiceClientTest",
         "com.google.ai.generativelanguage.v1beta.DiscussServiceClientHttpJsonTest",
         "com.google.ai.generativelanguage.v1beta.DiscussServiceClientTest",
         "com.google.ai.generativelanguage.v1beta.FileServiceClientHttpJsonTest",
@@ -115,6 +125,8 @@ java_gapic_test(
         "com.google.ai.generativelanguage.v1beta.ModelServiceClientTest",
         "com.google.ai.generativelanguage.v1beta.PermissionServiceClientHttpJsonTest",
         "com.google.ai.generativelanguage.v1beta.PermissionServiceClientTest",
+        "com.google.ai.generativelanguage.v1beta.PredictionServiceClientHttpJsonTest",
+        "com.google.ai.generativelanguage.v1beta.PredictionServiceClientTest",
         "com.google.ai.generativelanguage.v1beta.RetrieverServiceClientHttpJsonTest",
         "com.google.ai.generativelanguage.v1beta.RetrieverServiceClientTest",
         "com.google.ai.generativelanguage.v1beta.TextServiceClientHttpJsonTest",
@@ -144,17 +156,18 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "go_gapic_assembly_pkg",
     "go_gapic_library",
-    "go_proto_library",
+    "go_grpc_library",
 )
 
-go_proto_library(
+go_grpc_library(
     name = "generativelanguage_go_proto",
-    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
     importpath = "cloud.google.com/go/ai/generativelanguage/apiv1beta/generativelanguagepb",
     protos = [":generativelanguage_proto"],
     deps = [
         "//google/api:annotations_go_proto",
         "//google/longrunning:longrunning_go_proto",
+        "//google/rpc:status_go_proto",
+        "//google/type:interval_go_proto",
     ],
 )
 
@@ -173,6 +186,7 @@ go_gapic_library(
         "//google/longrunning:longrunning_go_proto",
         "@com_google_cloud_go_longrunning//:go_default_library",
         "@com_google_cloud_go_longrunning//autogen:go_default_library",
+        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
         "@io_bazel_rules_go//proto/wkt:struct_go_proto",
     ],
 )
@@ -359,6 +373,7 @@ load(
 
 csharp_proto_library(
     name = "generativelanguage_csharp_proto",
+    extra_opts = [],
     deps = [":generativelanguage_proto"],
 )
 

@@ -11,6 +11,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+    "nodejs_gapic_combined_pkg"
 )
 
 # Generates a Ruby wrapper client for cloudprofiler.
@@ -23,7 +24,7 @@ ruby_cloud_gapic_library(
         "ruby-cloud-gem-name=google-cloud-profiler",
         "ruby-cloud-env-prefix=PROFILER",
         "ruby-cloud-wrapper-of=v2:0.9",
-        "ruby-cloud-product-url=https://cloud.google.com/profiler/",
+        "ruby-cloud-product-url=https://cloud.google.com/profiler/docs",
         "ruby-cloud-api-id=cloudprofiler.googleapis.com",
         "ruby-cloud-api-shortname=cloudprofiler",
     ],
@@ -37,5 +38,14 @@ ruby_gapic_assembly_pkg(
     name = "google-cloud-profiler-ruby",
     deps = [
         ":cloudprofiler_ruby_wrapper",
+    ],
+)
+
+nodejs_gapic_combined_pkg(
+    name = "google-devtools-cloudprofiler-nodejs",
+    default_version = "v2",
+    templates_excludes = ["package.json"],
+    deps = [
+        "//google/devtools/cloudprofiler/v2:devtools-cloudprofiler-v2-nodejs"
     ],
 )
