@@ -12,6 +12,7 @@
       { "service": "google.chat.v1.ChatService", "method": "GetSpace" },
       { "service": "google.chat.v1.ChatService", "method": "ListSpaces" },
       { "service": "google.chat.v1.ChatService", "method": "DeleteSpace" },
+      { "service": "google.chat.v1.ChatService", "method": "SearchSpaces" },
       { "service": "google.chat.v1.ChatService", "method": "CreateMembership" },
       { "service": "google.chat.v1.ChatService", "method": "GetMembership" },
       { "service": "google.chat.v1.ChatService", "method": "ListMemberships" },
@@ -19,6 +20,10 @@
       { "service": "google.chat.v1.ChatService", "method": "CreateReaction" },
       { "service": "google.chat.v1.ChatService", "method": "ListReactions" },
       { "service": "google.chat.v1.ChatService", "method": "DeleteReaction" },
+      { "service": "google.chat.v1.ChatService", "method": "CreateCustomEmoji" },
+      { "service": "google.chat.v1.ChatService", "method": "DeleteCustomEmoji" },
+      { "service": "google.chat.v1.ChatService", "method": "GetCustomEmoji" },
+      { "service": "google.chat.v1.ChatService", "method": "ListCustomEmojis" },
       { "service": "google.chat.v1.ChatService", "method": "UploadAttachment" },
       { "service": "google.chat.v1.ChatService", "method": "FindDirectMessage" },
       { "service": "google.chat.v1.ChatService", "method": "CompleteImportSpace" },
@@ -26,7 +31,11 @@
       { "service": "google.chat.v1.ChatService", "method": "UpdateSpaceReadState" },
       { "service": "google.chat.v1.ChatService", "method": "GetSpaceReadState" },
       { "service": "google.chat.v1.ChatService", "method": "GetThreadReadState" },
-      { "service": "google.chat.v1.ChatService", "method": "GetAttachment" }
+      { "service": "google.chat.v1.ChatService", "method": "GetAttachment" },
+      { "service": "google.chat.v1.ChatService", "method": "GetSpaceEvent" },
+      { "service": "google.chat.v1.ChatService", "method": "ListSpaceEvents" },
+      { "service": "google.chat.v1.ChatService", "method": "GetSpaceNotificationSetting" },
+      { "service": "google.chat.v1.ChatService", "method": "UpdateSpaceNotificationSetting" }
     ],
     "timeout": "30s",
     "retryPolicy": {

@@ -86,12 +86,15 @@ authentication:
         https://www.googleapis.com/auth/cloud-platform
 
 publishing:
+  new_issue_uri: https://issuetracker.google.com/issues/new?component=1132231&template=1639002
   documentation_uri: https://cloud.google.com/document-ai/docs
+  api_short_name: documentai
   github_label: 'api: documentai'
   organization: CLOUD
   library_settings:
   - version: google.cloud.documentai.v1
     dotnet_settings:
+      common: {}
       ignored_resources:
       - documentai.googleapis.com/Location
   proto_reference_documentation_uri: https://cloud.google.com/document-ai/docs/reference/rpc

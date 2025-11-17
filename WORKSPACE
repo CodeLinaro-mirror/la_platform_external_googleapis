@@ -5,6 +5,20 @@ workspace(
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 ##############################################################################
+# Generator versions stored in generator-versions.json
+##############################################################################
+
+load("//:load_json.bzl", "load_json")
+
+load_json(
+    name = "generator_versions",
+    src = "//:generator-versions.json",
+    variable_name = "generator_versions",
+)
+
+load("@generator_versions//:json.bzl", "generator_versions")
+
+##############################################################################
 # Common
 ##############################################################################
 
@@ -149,9 +163,9 @@ http_archive(
 
 # Explicitly declaring Protobuf version, while Protobuf dependency is already
 # instantiated in grpc_deps().
-_protobuf_version = "25.3"
+_protobuf_version = "25.7"
 
-_protobuf_sha256 = "d19643d265b978383352b3143f04c0641eea75a75235c111cc01a1350173180e"
+_protobuf_sha256 = "af034f71287cff2f1691649772c61b13696787a06ff616cadf9869611491fabe"
 
 http_archive(
     name = "com_google_protobuf",
@@ -164,7 +178,8 @@ load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 
 grpc_deps()
 
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps", "PROTOBUF_MAVEN_ARTIFACTS")
+load("@com_google_protobuf//:protobuf_deps.bzl", "PROTOBUF_MAVEN_ARTIFACTS", "protobuf_deps")
+
 # This is actually already done within grpc_deps but calling this for Bazel convention.
 protobuf_deps()
 
@@ -208,19 +223,23 @@ rules_proto_toolchains()
 # version of rules_gapic.
 _rules_gapic_version = "1.0.0"
 
-
 http_archive(
     name = "rules_gapic",
     strip_prefix = "rules_gapic-%s" % _rules_gapic_version,
     urls = ["https://github.com/googleapis/rules_gapic/archive/v%s.tar.gz" % _rules_gapic_version],
 )
 
-_gapic_generator_go_version = "0.41.3"
+_gapic_generator_go_commit = generator_versions["go"]["commit"]
+
+_gapic_generator_go_version = generator_versions["go"]["version"]
+
+_gapic_generator_go_sha256 = generator_versions["go"]["sha"]
 
 http_archive(
     name = "com_googleapis_gapic_generator_go",
-    strip_prefix = "gapic-generator-go-%s" % _gapic_generator_go_version,
-    urls = ["https://github.com/googleapis/gapic-generator-go/archive/v%s.tar.gz" % _gapic_generator_go_version],
+    sha256 = _gapic_generator_go_sha256,
+    strip_prefix = "gapic-generator-go-%s" % _gapic_generator_go_version if _gapic_generator_go_version else "gapic-generator-go-%s" % _gapic_generator_go_commit,
+    urls = ["https://github.com/googleapis/gapic-generator-go/archive/v%s.tar.gz" % _gapic_generator_go_version if _gapic_generator_go_version else "https://github.com/googleapis/gapic-generator-go/archive/%s.tar.gz" % _gapic_generator_go_commit],
 )
 
 load("@com_googleapis_gapic_generator_go//:repositories.bzl", "com_googleapis_gapic_generator_go_repositories")
@@ -232,7 +251,7 @@ com_googleapis_gapic_generator_go_repositories()
 # dependencies of gapic-generator-go.
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
 
-go_register_toolchains(version = "1.19.13")
+go_register_toolchains(version = "1.23.9")
 
 go_rules_dependencies()
 
@@ -255,39 +274,25 @@ rules_gapic_repositories()
 
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
-maven_install(
-    artifacts = PROTOBUF_MAVEN_ARTIFACTS,
-    generate_compat_repositories = True,
-    repositories = [
-        "https://repo.maven.apache.org/maven2/",
-    ],
-)
+_gapic_generator_java_commit = generator_versions["java"]["commit"]
 
-_gapic_generator_java_version = "2.39.0"
+_gapic_generator_java_version = generator_versions["java"]["version"]
 
-maven_install(
-    artifacts = [
-        "com.google.api:gapic-generator-java:" + _gapic_generator_java_version,
-    ],
-    #Update this False for local development
-    fail_on_missing_checksum = True,
-    repositories = [
-        "m2Local",
-        "https://repo.maven.apache.org/maven2/",
-    ]
-)
+_gapic_generator_java_sha256 = generator_versions["java"]["sha"]
 
 http_archive(
     name = "gapic_generator_java",
-    strip_prefix = "sdk-platform-java-%s" % _gapic_generator_java_version,
-    urls = ["https://github.com/googleapis/sdk-platform-java/archive/v%s.zip" % _gapic_generator_java_version],
+    sha256 = _gapic_generator_java_sha256,
+    strip_prefix = "sdk-platform-java-%s" % _gapic_generator_java_version if _gapic_generator_java_version else "sdk-platform-java-%s" % _gapic_generator_java_commit,
+    urls = ["https://github.com/googleapis/sdk-platform-java/archive/v%s.zip" % _gapic_generator_java_version if _gapic_generator_java_version else "https://github.com/googleapis/sdk-platform-java/archive/%s.zip" % _gapic_generator_java_commit],
 )
 
 # gax-java is part of sdk-platform-java repository
 http_archive(
     name = "com_google_api_gax_java",
-    strip_prefix = "sdk-platform-java-%s/gax-java" % _gapic_generator_java_version,
-    urls = ["https://github.com/googleapis/sdk-platform-java/archive/v%s.zip" % _gapic_generator_java_version],
+    sha256 = _gapic_generator_java_sha256,
+    strip_prefix = "sdk-platform-java-%s/gax-java" % _gapic_generator_java_version if _gapic_generator_java_version else "sdk-platform-java-%s/gax-java" % _gapic_generator_java_commit,
+    urls = ["https://github.com/googleapis/sdk-platform-java/archive/v%s.zip" % _gapic_generator_java_version if _gapic_generator_java_version else "https://github.com/googleapis/sdk-platform-java/archive/%s.zip" % _gapic_generator_java_commit],
 )
 
 load("@com_google_api_gax_java//:repository_rules.bzl", "com_google_api_gax_java_properties")
@@ -301,9 +306,31 @@ load("@com_google_api_gax_java//:repositories.bzl", "com_google_api_gax_java_rep
 
 com_google_api_gax_java_repositories()
 
-load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")
+load("@io_grpc_grpc_java//:repositories.bzl", "IO_GRPC_GRPC_JAVA_ARTIFACTS", "grpc_java_repositories")
 
 grpc_java_repositories()
+
+load("@envoy_api//bazel:repositories.bzl", "api_dependencies")
+
+api_dependencies()
+
+maven_install(
+    artifacts = [
+                    "com.google.api:gapic-generator-java:" + _gapic_generator_java_version,
+                ] + PROTOBUF_MAVEN_ARTIFACTS +
+                IO_GRPC_GRPC_JAVA_ARTIFACTS,
+    #Update this False for local development
+    fail_on_missing_checksum = True,
+    generate_compat_repositories = True,
+    repositories = [
+        "m2Local",
+        "https://repo.maven.apache.org/maven2/",
+    ],
+)
+
+load("@maven//:compat.bzl", "compat_repositories")
+
+compat_repositories()
 
 ##############################################################################
 # Python
@@ -312,12 +339,17 @@ load("@rules_gapic//python:py_gapic_repositories.bzl", "py_gapic_repositories")
 
 py_gapic_repositories()
 
-_gapic_generator_python_version = "1.16.1"
+_gapic_generator_python_commit = generator_versions["python"]["commit"]
+
+_gapic_generator_python_version = generator_versions["python"]["version"]
+
+_gapic_generator_python_sha256 = generator_versions["python"]["sha"]
 
 http_archive(
     name = "gapic_generator_python",
-    strip_prefix = "gapic-generator-python-%s" % _gapic_generator_python_version,
-    urls = ["https://github.com/googleapis/gapic-generator-python/archive/v%s.zip" % _gapic_generator_python_version],
+    sha256 = _gapic_generator_python_sha256,
+    strip_prefix = "gapic-generator-python-%s" % _gapic_generator_python_version if _gapic_generator_python_version else "gapic-generator-python-%s" % _gapic_generator_python_commit,
+    urls = ["https://github.com/googleapis/gapic-generator-python/archive/v%s.zip" % _gapic_generator_python_version if _gapic_generator_python_version else "https://github.com/googleapis/gapic-generator-python/archive/%s.tar.gz" % _gapic_generator_python_commit],
 )
 
 load(
@@ -325,7 +357,6 @@ load(
     "gapic_generator_python",
     "gapic_generator_register_toolchains",
 )
-
 load("@rules_python//python:repositories.bzl", "py_repositories")
 
 py_repositories()
@@ -349,57 +380,68 @@ gapic_generator_register_toolchains()
 # TypeScript
 ##############################################################################
 
-_gapic_generator_typescript_version = "4.5.0"
+_gapic_generator_typescript_commit = generator_versions["typescript"]["commit"]
 
-_gapic_generator_typescript_sha256 = "e37a2b34a7df6ef51aa69b9be2ed45f4a6edabbe6505cfc4beff1f7f2039d1c2"
+_gapic_generator_typescript_version = generator_versions["typescript"]["version"]
+
+_gapic_generator_typescript_sha256 = generator_versions["typescript"]["sha"]
 
 ### TypeScript generator
 http_archive(
     name = "gapic_generator_typescript",
     sha256 = _gapic_generator_typescript_sha256,
-    strip_prefix = "gapic-generator-typescript-%s" % _gapic_generator_typescript_version,
-    urls = ["https://github.com/googleapis/gapic-generator-typescript/archive/v%s.tar.gz" % _gapic_generator_typescript_version],
+    strip_prefix = "gapic-generator-typescript-%s" % _gapic_generator_typescript_version if _gapic_generator_typescript_version else "gapic-generator-typescript-%s" % _gapic_generator_typescript_commit,
+    urls = ["https://github.com/googleapis/gapic-generator-typescript/archive/v%s.tar.gz" % _gapic_generator_typescript_version if _gapic_generator_typescript_version else "https://github.com/googleapis/gapic-generator-typescript/archive/%s.tar.gz" % _gapic_generator_typescript_commit],
 )
 
-load("@gapic_generator_typescript//:repositories.bzl", "gapic_generator_typescript_repositories", "NODE_VERSION")
+load("@gapic_generator_typescript//:repositories.bzl", "gapic_generator_typescript_repositories")
+
 gapic_generator_typescript_repositories()
 
-load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
-rules_js_dependencies()
-
 load("@aspect_rules_ts//ts:repositories.bzl", "rules_ts_dependencies")
+
 rules_ts_dependencies(
     ts_version_from = "@gapic_generator_typescript//:package.json",
 )
 
-load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
-nodejs_register_toolchains(
-  name = "nodejs",
-  node_version = NODE_VERSION,
+load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
+
+rules_js_dependencies()
+
+load("@aspect_rules_js//js:toolchains.bzl", "DEFAULT_NODE_VERSION", "rules_js_register_toolchains")
+
+rules_js_register_toolchains(node_version = DEFAULT_NODE_VERSION)
+
+load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock", "pnpm_repository")
+
+npm_translate_lock(
+    name = "npm",
+    data = ["@gapic_generator_typescript//:package.json"],
+    pnpm_lock = "@gapic_generator_typescript//:pnpm-lock.yaml",
+    update_pnpm_lock = True,
 )
 
-load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock", "pnpm_repository")
-npm_translate_lock(
-  name = "npm",
-  pnpm_lock = "@gapic_generator_typescript//:pnpm-lock.yaml",
-  data = ["@gapic_generator_typescript//:package.json"],
-)
+pnpm_repository(name = "pnpm")
 
 load("@npm//:repositories.bzl", "npm_repositories")
+
 npm_repositories()
-pnpm_repository(name = "pnpm")
 
 ##############################################################################
 # PHP
 ##############################################################################
 
-# PHP micro-generator
-_gapic_generator_php_version = "1.12.1"
+_gapic_generator_php_commit = generator_versions["php"]["commit"]
+
+_gapic_generator_php_version = generator_versions["php"]["version"]
+
+_gapic_generator_php_sha256 = generator_versions["php"]["sha"]
 
 http_archive(
     name = "gapic_generator_php",
-    strip_prefix = "gapic-generator-php-%s" % _gapic_generator_php_version,
-    urls = ["https://github.com/googleapis/gapic-generator-php/archive/v%s.zip" % _gapic_generator_php_version],
+    sha256 = _gapic_generator_php_sha256,
+    strip_prefix = "gapic-generator-php-%s" % _gapic_generator_php_version if _gapic_generator_php_version else "gapic-generator-php-%s" % _gapic_generator_php_commit,
+    urls = ["https://github.com/googleapis/gapic-generator-php/archive/v%s.zip" % _gapic_generator_php_version if _gapic_generator_php_version else "https://github.com/googleapis/gapic-generator-php/archive/%s.tar.gz" % _gapic_generator_php_commit],
 )
 
 load("@rules_gapic//php:php_gapic_repositories.bzl", "php_gapic_repositories")
@@ -427,14 +469,17 @@ http_archive(
     urls = ["https://github.com/googleapis/gax-dotnet/archive/refs/tags/%s.tar.gz" % _gax_dotnet_version],
 )
 
-_gapic_generator_csharp_version = "1.4.27"
-_gapic_generator_csharp_sha256 = "039d975d38bd403ebf1b3f0ba5d1fb6c2d66a9cd9228c53466f59d36a75c83a6"
+_gapic_generator_csharp_commit = generator_versions["csharp"]["commit"]
+
+_gapic_generator_csharp_version = generator_versions["csharp"]["version"]
+
+_gapic_generator_csharp_sha256 = generator_versions["csharp"]["sha"]
 
 http_archive(
     name = "gapic_generator_csharp",
     sha256 = _gapic_generator_csharp_sha256,
-    strip_prefix = "gapic-generator-csharp-%s" % _gapic_generator_csharp_version,
-    urls = ["https://github.com/googleapis/gapic-generator-csharp/archive/refs/tags/v%s.tar.gz" % _gapic_generator_csharp_version],
+    strip_prefix = "gapic-generator-csharp-%s" % _gapic_generator_csharp_version if _gapic_generator_csharp_version else "gapic-generator-csharp-%s" % _gapic_generator_csharp_commit,
+    urls = ["https://github.com/googleapis/gapic-generator-csharp/archive/refs/tags/v%s.tar.gz" % _gapic_generator_csharp_version if _gapic_generator_csharp_version else "https://github.com/googleapis/gapic-generator-csharp/archive/%s.tar.gz" % _gapic_generator_csharp_commit],
 )
 
 load("@gapic_generator_csharp//:repositories.bzl", "gapic_generator_csharp_repositories")
@@ -445,15 +490,17 @@ gapic_generator_csharp_repositories()
 # Ruby
 ##############################################################################
 
-_gapic_generator_ruby_version = "v0.29.0"
+_gapic_generator_ruby_commit = generator_versions["ruby"]["commit"]
 
-_gapic_generator_ruby_sha256 = "21d8c448e99eef6a2d8182f0422c70f8adddf9fc333d6c739e47720702ce52df"
+_gapic_generator_ruby_version = generator_versions["ruby"]["version"]
+
+_gapic_generator_ruby_sha256 = generator_versions["ruby"]["sha"]
 
 http_archive(
     name = "gapic_generator_ruby",
     sha256 = _gapic_generator_ruby_sha256,
-    strip_prefix = "gapic-generator-ruby-gapic-generator-%s" % _gapic_generator_ruby_version,
-    urls = ["https://github.com/googleapis/gapic-generator-ruby/archive/refs/tags/gapic-generator/%s.tar.gz" % _gapic_generator_ruby_version],
+    strip_prefix = "gapic-generator-ruby-gapic-generator-v%s" % _gapic_generator_ruby_version if _gapic_generator_ruby_version else "gapic-generator-ruby-%s" % _gapic_generator_ruby_commit,
+    urls = ["https://github.com/googleapis/gapic-generator-ruby/archive/refs/tags/gapic-generator/v%s.tar.gz" % _gapic_generator_ruby_version if _gapic_generator_ruby_version else "https://github.com/googleapis/gapic-generator-ruby/archive/%s.tar.gz" % _gapic_generator_ruby_commit],
 )
 
 load("@gapic_generator_ruby//rules_ruby_gapic:repositories.bzl", "gapic_generator_ruby_repositories")
@@ -464,7 +511,7 @@ gapic_generator_ruby_repositories()
 # Discovery
 ##############################################################################
 
-_disco_to_proto3_converter_version = "8163e5ea8d8dbcf0899534d2895819ab135ffab5"
+_disco_to_proto3_converter_version = "ebc9e9e267bfbc9a1173dd5f212a2dd03bf7b9d5"
 
 http_archive(
     name = "com_google_disco_to_proto3_converter",

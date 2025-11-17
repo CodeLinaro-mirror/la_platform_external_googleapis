@@ -11,6 +11,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+    "nodejs_gapic_combined_pkg"
 )
 
 # Generates a Ruby wrapper client for servicehealth.
@@ -21,7 +22,7 @@ ruby_cloud_gapic_library(
     srcs = ["//google/cloud/servicehealth/v1:servicehealth_proto_with_info"],
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-cloud-service_health",
-        "ruby-cloud-wrapper-of=v1:0.0",
+        "ruby-cloud-wrapper-of=v1:2.0",
     ],
     service_yaml = "//google/cloud/servicehealth/v1:servicehealth_v1.yaml",
     transport = "grpc+rest",
@@ -32,5 +33,14 @@ ruby_gapic_assembly_pkg(
     name = "google-cloud-servicehealth-ruby",
     deps = [
         ":servicehealth_ruby_wrapper",
+    ],
+)
+
+nodejs_gapic_combined_pkg(
+    name = "google-cloud-servicehealth-nodejs",
+    default_version = "v1",
+    templates_excludes = ["package.json"],
+    deps = [
+        "//google/cloud/servicehealth/v1:servicehealth-v1-nodejs"
     ],
 )

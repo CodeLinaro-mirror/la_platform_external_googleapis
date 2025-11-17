@@ -11,6 +11,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+    "nodejs_gapic_combined_pkg"
 )
 
 # Generates a Ruby wrapper client for retail.
@@ -22,7 +23,7 @@ ruby_cloud_gapic_library(
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-cloud-retail",
         "ruby-cloud-env-prefix=RETAIL",
-        "ruby-cloud-wrapper-of=v2:0.18",
+        "ruby-cloud-wrapper-of=v2:2.0",
         "ruby-cloud-product-url=https://cloud.google.com/retail/docs/apis",
         "ruby-cloud-api-id=retail.googleapis.com",
         "ruby-cloud-api-shortname=retail",
@@ -37,5 +38,16 @@ ruby_gapic_assembly_pkg(
     name = "google-cloud-retail-ruby",
     deps = [
         ":retail_ruby_wrapper",
+    ],
+)
+
+nodejs_gapic_combined_pkg(
+    name = "google-cloud-retail-nodejs",
+    default_version = "v2beta",
+    templates_excludes = ["package.json"],
+    deps = [
+        "//google/cloud/retail/v2:retail-v2-nodejs",
+        "//google/cloud/retail/v2alpha:retail-v2alpha-nodejs",
+        "//google/cloud/retail/v2beta:retail-v2beta-nodejs"
     ],
 )

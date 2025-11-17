@@ -11,6 +11,7 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "ruby_cloud_gapic_library",
     "ruby_gapic_assembly_pkg",
+    "nodejs_gapic_combined_pkg"
 )
 
 # Generates a Ruby wrapper client for alloydb.
@@ -22,7 +23,8 @@ ruby_cloud_gapic_library(
     extra_protoc_parameters = [
         "ruby-cloud-gem-name=google-cloud-alloy_db",
         "ruby-cloud-gem-namespace=Google::Cloud::AlloyDB",
-        "ruby-cloud-wrapper-of=v1:0.8;v1beta:0.6",
+        "ruby-cloud-wrapper-of=v1:1.0",
+        "ruby-cloud-service-override=AlloyDBCSQLAdmin=AlloyDBCloudSQLAdmin",
     ],
     service_yaml = "//google/cloud/alloydb/v1:alloydb_v1.yaml",
     transport = "grpc+rest",
@@ -33,5 +35,16 @@ ruby_gapic_assembly_pkg(
     name = "google-cloud-alloydb-ruby",
     deps = [
         ":alloydb_ruby_wrapper",
+    ],
+)
+
+nodejs_gapic_combined_pkg(
+    name = "google-cloud-alloydb-nodejs",
+    default_version = "v1",
+    templates_excludes = ["package.json"],
+    deps = [
+        "//google/cloud/alloydb/v1:alloydb-v1-nodejs",
+        "//google/cloud/alloydb/v1alpha:alloydb-v1alpha-nodejs",
+        "//google/cloud/alloydb/v1beta:alloydb-v1beta-nodejs"
     ],
 )
